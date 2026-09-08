@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Система подвоза</title>
+  <title>Управление подвозом</title>
   <style>
     :root {
       --bg-main: #0f0c1b;
       --bg-card: #18142c;
       --primary: #8a2be2;
       --primary-hover: #9d4edd;
-      --accent-green: #00f5d4;
-      --accent-green-hover: #01c7ac;
       --accent-orange: #ff5400;
       --accent-blue: #70d6ff;
       --text-main: #f3f0ff;
@@ -26,44 +24,22 @@
     }
     .container {
       width: 100%; max-width: 460px;
-      background: var(--bg-card); padding: 25px;
+      background: var(--bg-card); padding: 30px;
       border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 1px 1px var(--border);
       box-sizing: border-box;
     }
-    .nav-tabs {
-      display: flex; background: var(--bg-main);
-      padding: 4px; border-radius: 10px; margin-bottom: 25px; border: 1px solid var(--border);
-    }
-    .nav-btn {
-      flex: 1; padding: 12px; cursor: pointer; border: none; background: transparent;
-      text-align: center; font-weight: 600; color: var(--text-muted); border-radius: 8px;
-      transition: all 0.3s ease; font-size: 14px;
-    }
-    .nav-btn.active {
-      background: var(--primary); color: var(--text-main); box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
-    }
-    .screen { display: none; }
-    .screen.active { display: block; animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    h2 { margin-top: 0; margin-bottom: 20px; font-size: 22px; font-weight: 600; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
-    input, select {
-      width: 100%; padding: 14px; background: var(--bg-main); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text-main); font-size: 16px; box-sizing: border-box;
-    }
-    input:focus, select:focus { outline: none; border-color: var(--primary); }
-    .btn {
-      width: 100%; padding: 16px; background: var(--accent-green); color: #05040a;
-      border: none; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 700;
-    }
-    .btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+    h2 { margin-top: 0; margin-bottom: 10px; font-size: 24px; font-weight: 600; text-align: center; }
     .square-display {
-      font-size: 64px; font-weight: 800; text-align: center; margin: 35px 0;
+      font-size: 72px; font-weight: 800; text-align: center; margin: 40px 0;
       background: linear-gradient(45deg, #b5179e, #7209b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .btn-done { background: var(--primary); color: var(--text-main); }
-    .no-orders { text-align: center; font-size: 16px; color: var(--text-muted); padding: 40px 0; }
+    .btn-done {
+      width: 100%; padding: 18px; background: var(--primary); color: var(--text-main);
+      border: none; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: 700;
+      transition: background 0.2s;
+    }
+    .btn-done:hover { background: var(--primary-hover); }
+    .no-orders { text-align: center; font-size: 18px; color: var(--text-muted); padding: 50px 0; }
     .modal {
       display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
       background: rgba(7, 5, 14, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center;
@@ -72,7 +48,7 @@
       background: var(--bg-card); padding: 30px; border-radius: 16px; text-align: center;
       max-width: 360px; width: 100%; border: 1px solid var(--border);
     }
-    .modal-btns { display: flex; gap: 15px; margin-top: 20px; }
+    .modal-btns { display: flex; gap: 15px; margin-top: 25px; }
     .btn-modal { flex: 1; padding: 18px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
     .btn-kgt { background: var(--accent-orange); color: white; }
     .btn-std { background: var(--accent-blue); color: #05040a; }
@@ -81,37 +57,13 @@
 <body>
 
 <div class="container">
-  <div class="nav-tabs">
-    <button class="nav-btn active" onclick="switchScreen(this, 'screen1')">Заказ</button>
-    <button class="nav-btn" onclick="switchScreen(this, 'screen2')">Подвоз</button>
+  <h2>Текущее задание</h2>
+  <div id="order-box">
+    <div class="square-display" id="current-square">...</div>
+    <button class="btn-done" onclick="showModal()">Готово</button>
   </div>
-
-  <!-- СЦЕНАРИЙ 1 -->
-  <div id="screen1" class="screen active">
-    <h2>Заказать подвоз</h2>
-    <div class="form-group">
-      <label for="badge">Бейдж сотрудника</label>
-      <input type="text" id="badge" placeholder="Введите номер">
-    </div>
-    <div class="form-group">
-      <label for="square">Выгрузить в квадрат</label>
-      <select id="square">
-        <option value="">Загрузка списка...</option>
-      </select>
-    </div>
-    <button class="btn" id="btnSubmit" onclick="submitOrder()">Отправить заявку</button>
-  </div>
-
-  <!-- СЦЕНАРИЙ 2 -->
-  <div id="screen2" class="screen">
-    <h2>Текущее задание</h2>
-    <div id="order-box">
-      <div class="square-display" id="current-square">...</div>
-      <button class="btn btn-done" onclick="showModal()">Готово</button>
-    </div>
-    <div id="empty-box" class="no-orders" style="display:none;">
-      ✨ Все задания выполнены!
-    </div>
+  <div id="empty-box" class="no-orders" style="display:none;">
+    ✨ Все задания выполнены!
   </div>
 </div>
 
@@ -126,17 +78,15 @@
 </div>
 
 <script>
-  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT С КНОПКИ РАЗВЕРТЫВАНИЯ
+  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT
   const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec"; 
 
   let currentOrderRow = null;
 
   window.onload = function() {
-    loadSquares();
     loadNextOrder();
   };
 
-  // Функция-обходчик CORS через JSONP для безопасного чтения данных
   function jsonp(url, callbackName, successCallback) {
     window[callbackName] = function(data) {
       successCallback(data);
@@ -147,59 +97,6 @@
     script.id = callbackName;
     script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
     document.body.appendChild(script);
-  }
-
-  function loadSquares() {
-    jsonp(`${API_URL}?action=getSquares`, 'cb_squares', function(response) {
-      if(response.success) {
-        let select = document.getElementById('square');
-        select.innerHTML = '<option value="">Выберите квадрат</option>';
-        response.data.forEach(sq => {
-          let opt = document.createElement('option');
-          opt.value = sq; opt.innerText = sq;
-          select.appendChild(opt);
-        });
-      }
-    });
-  }
-
-  function switchScreen(element, screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    element.classList.add('active');
-    if(screenId === 'screen2') loadNextOrder();
-  }
-
-  function submitOrder() {
-    let badge = document.getElementById('badge').value.trim();
-    let square = document.getElementById('square').value;
-    let btn = document.getElementById('btnSubmit');
-    
-    if(!badge || !square) { alert('Заполните все поля!'); return; }
-    
-    btn.disabled = true; btn.innerText = 'Отправка...';
-
-    // Для POST запросов в режиме no-cors (Google принимает данные формы через URLSearchParams)
-    let formBody = new URLSearchParams();
-    formBody.append('action', 'addOrder');
-    formBody.append('badge', badge);
-    formBody.append('square', square);
-
-    fetch(API_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formBody
-    }).then(() => {
-      alert('Заявка отправлена!');
-      document.getElementById('badge').value = '';
-      document.getElementById('square').value = '';
-      btn.disabled = false; btn.innerText = 'Отправить заявку';
-    }).catch(err => {
-      alert('Ошибка отправки');
-      btn.disabled = false; btn.innerText = 'Отправить заявку';
-    });
   }
 
   function loadNextOrder() {
@@ -218,7 +115,9 @@
     });
   }
 
-  function showModal() { if(currentOrderRow) document.getElementById('typeModal').style.display = 'flex'; }
+  function showModal() { 
+    if(currentOrderRow) document.getElementById('typeModal').style.display = 'flex'; 
+  }
 
   function selectType(type) {
     document.getElementById('typeModal').style.display = 'none';
@@ -236,11 +135,10 @@
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formBody
     }).then(() => {
-      // Так как при POST + no-cors мы не можем прочитать ответ из-за политик безопасности Google,
-      // мы просто заново запрашиваем следующую самую старую запись через безопасный GET.
-      setTimeout(loadNextOrder, 500); // Небольшая задержка, чтобы Google успел обновить ячейку
+      // Запрашиваем следующую строку с небольшой задержкой
+      setTimeout(loadNextOrder, 400); 
     }).catch(err => {
-      alert('Ошибка при обновлении статуса');
+      alert('Ошибка сети при обновлении статуса');
     });
   }
 </script>

@@ -126,8 +126,8 @@
 </div>
 
 <script>
-  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT
-  const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec"; 
+  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT С КНОПКИ РАЗВЕРТЫВАНИЯ
+  const API_URL = "ВАШ_URL_ИЗ_GOOGLE_APPS_SCRIPT"; 
 
   let currentOrderRow = null;
 
@@ -136,23 +136,31 @@
     loadNextOrder();
   };
 
+  // Функция-обходчик CORS через JSONP для безопасного чтения данных
+  function jsonp(url, callbackName, successCallback) {
+    window[callbackName] = function(data) {
+      successCallback(data);
+      document.getElementById(callbackName).remove();
+      delete window[callbackName];
+    };
+    let script = document.createElement('script');
+    script.id = callbackName;
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+    document.body.appendChild(script);
+  }
+
   function loadSquares() {
-    fetch(`${API_URL}?action=getSquares`)
-      .then(res => res.json())
-      .then(response => {
-        if(response.success) {
-          let select = document.getElementById('square');
-          select.innerHTML = '<option value="">Выберите квадрат</option>';
-          response.data.forEach(sq => {
-            let opt = document.createElement('option');
-            opt.value = sq; opt.innerText = sq;
-            select.appendChild(opt);
-          });
-        }
-      }).catch(err => {
-        document.getElementById('square').innerHTML = '<option value="">Ошибка загрузки</option>';
-        console.error(err);
-      });
+    jsonp(`${API_URL}?action=getSquares`, 'cb_squares', function(response) {
+      if(response.success) {
+        let select = document.getElementById('square');
+        select.innerHTML = '<option value="">Выберите квадрат</option>';
+        response.data.forEach(sq => {
+          let opt = document.createElement('option');
+          opt.value = sq; opt.innerText = sq;
+          select.appendChild(opt);
+        });
+      }
+    });
   }
 
   function switchScreen(element, screenId) {
@@ -172,37 +180,42 @@
     
     btn.disabled = true; btn.innerText = 'Отправка...';
 
+    // Для POST запросов в режиме no-cors (Google принимает данные формы через URLSearchParams)
+    let formBody = new URLSearchParams();
+    formBody.append('action', 'addOrder');
+    formBody.append('badge', badge);
+    formBody.append('square', square);
+
     fetch(API_URL, {
       method: 'POST',
-      mode: 'no-cors', // Важно для обхода ограничений безопасности Google
-      body: JSON.stringify({ action: 'addOrder', badge: badge, square: square })
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
     }).then(() => {
       alert('Заявка отправлена!');
       document.getElementById('badge').value = '';
       document.getElementById('square').value = '';
       btn.disabled = false; btn.innerText = 'Отправить заявку';
     }).catch(err => {
-      alert('Ошибка сети');
+      alert('Ошибка отправки');
       btn.disabled = false; btn.innerText = 'Отправить заявку';
     });
   }
 
   function loadNextOrder() {
     document.getElementById('current-square').innerText = '...';
-    fetch(`${API_URL}?action=getOldest`)
-      .then(res => res.json())
-      .then(response => {
-        if(response.success && response.data) {
-          currentOrderRow = response.data.row;
-          document.getElementById('current-square').innerText = response.data.square;
-          document.getElementById('order-box').style.display = 'block';
-          document.getElementById('empty-box').style.display = 'none';
-        } else {
-          currentOrderRow = null;
-          document.getElementById('order-box').style.display = 'none';
-          document.getElementById('empty-box').style.display = 'block';
-        }
-      });
+    jsonp(`${API_URL}?action=getOldest`, 'cb_oldest', function(response) {
+      if(response.success && response.data) {
+        currentOrderRow = response.data.row;
+        document.getElementById('current-square').innerText = response.data.square;
+        document.getElementById('order-box').style.display = 'block';
+        document.getElementById('empty-box').style.display = 'none';
+      } else {
+        currentOrderRow = null;
+        document.getElementById('order-box').style.display = 'none';
+        document.getElementById('empty-box').style.display = 'block';
+      }
+    });
   }
 
   function showModal() { if(currentOrderRow) document.getElementById('typeModal').style.display = 'flex'; }
@@ -212,19 +225,22 @@
     if(!currentOrderRow) return;
     document.getElementById('current-square').innerText = '...';
 
+    let formBody = new URLSearchParams();
+    formBody.append('action', 'completeOrder');
+    formBody.append('row', currentOrderRow);
+    formBody.append('type', type);
+
     fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'completeOrder', row: currentOrderRow, type: type })
-    }).then(res => res.json())
-    .then(response => {
-      if(response.success && response.data) {
-        currentOrderRow = response.data.row;
-        document.getElementById('current-square').innerText = response.data.square;
-      } else {
-        currentOrderRow = null;
-        document.getElementById('order-box').style.display = 'none';
-        document.getElementById('empty-box').style.display = 'block';
-      }
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
+    }).then(() => {
+      // Так как при POST + no-cors мы не можем прочитать ответ из-за политик безопасности Google,
+      // мы просто заново запрашиваем следующую самую старую запись через безопасный GET.
+      setTimeout(loadNextOrder, 500); // Небольшая задержка, чтобы Google успел обновить ячейку
+    }).catch(err => {
+      alert('Ошибка при обновлении статуса');
     });
   }
 </script>

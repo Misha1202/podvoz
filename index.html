@@ -126,6 +126,7 @@
 </div>
 
 <script>
+  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT (заканчивается на /exec)
   const API_URL = "ВАШ_URL_ИЗ_GOOGLE_APPS_SCRIPT"; 
 
   let currentOrderRow = null;
@@ -134,13 +135,6 @@
   window.onload = function() {
     loadNextOrder();
   };
-
-  window.addEventListener('beforeunload', function (e) {
-    if (currentOrderRow) {
-      e.preventDefault();
-      e.returnValue = 'У вас есть активное задание!';
-    }
-  });
 
   function jsonp(url, callbackName, successCallback) {
     const uniqueCallback = callbackName + '_' + Math.round(Math.random() * 1000000);

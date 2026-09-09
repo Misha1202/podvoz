@@ -126,7 +126,6 @@
 </div>
 
 <script>
-  // СЮДА ВСТАВЬТЕ СВОЙ URL ИЗ GOOGLE APPS SCRIPT (заканчивается на /exec)
   const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec"; 
 
   let currentOrderRow = null;
@@ -135,6 +134,13 @@
   window.onload = function() {
     loadNextOrder();
   };
+
+  window.addEventListener('beforeunload', function (e) {
+    if (currentOrderRow) {
+      e.preventDefault();
+      e.returnValue = 'У вас есть активное задание!';
+    }
+  });
 
   function jsonp(url, callbackName, successCallback) {
     const uniqueCallback = callbackName + '_' + Math.round(Math.random() * 1000000);

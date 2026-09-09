@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Управление подвозом</title>
   <style>
     :root {
@@ -19,16 +19,20 @@
       --border: #2e2754;
     }
     body {
-      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0; padding: 15px;
       background-color: var(--bg-main); color: var(--text-main);
       display: flex; justify-content: center; align-items: center; min-height: 95vh;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
     .container {
       width: 100%; max-width: 460px;
       background: var(--bg-card); padding: 30px;
       border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 1px 1px var(--border);
       box-sizing: border-box; position: relative;
+      touch-action: manipulation;
     }
     .header-area {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
@@ -38,14 +42,31 @@
       background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main);
       border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 600;
       cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;
+      touch-action: manipulation;
     }
     .btn-refresh:hover { border-color: var(--primary); background: #1c1536; }
+    .btn-refresh:active { transform: scale(0.95); }
     .btn-refresh svg { width: 16px; height: 16px; fill: currentColor; transition: transform 0.4s ease; }
     .btn-refresh.loading svg { animation: spin 0.8s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .square-display {
-      font-size: 72px; font-weight: 800; text-align: center; margin-top: 30px; margin-bottom: 5px;
-      background: linear-gradient(45deg, #b5179e, #7209b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-size: 80px;
+      font-weight: 900;
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 5px;
+      color: #ffffff;
+      text-shadow:
+        0 0 10px rgba(138, 43, 226, 0.8),
+        0 0 20px rgba(138, 43, 226, 0.5),
+        0 0 40px rgba(138, 43, 226, 0.3),
+        0 0 80px rgba(138, 43, 226, 0.2);
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #c084fc, #a855f7, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
     }
     .badge-display {
       text-align: center; font-size: 18px; color: var(--text-muted); margin-bottom: 35px; font-weight: 500;
@@ -58,27 +79,79 @@
       width: 100%; padding: 18px; background: var(--primary); color: var(--text-main);
       border: none; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: 700;
       transition: background 0.2s;
+      touch-action: manipulation;
     }
     .btn-done:hover { background: var(--primary-hover); }
+    .btn-done:active { transform: scale(0.98); }
     .btn-exit {
       width: 100%; padding: 14px; background: transparent; color: var(--accent-red);
       border: 1px solid var(--border); border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600;
       transition: all 0.2s;
+      touch-action: manipulation;
     }
     .btn-exit:hover { background: rgba(255, 71, 87, 0.1); border-color: var(--accent-red); }
+    .btn-exit:active { transform: scale(0.98); }
     .no-orders { text-align: center; font-size: 18px; color: var(--text-muted); padding: 50px 0; }
     .modal {
       display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%;
       background: rgba(7, 5, 14, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center;
+      touch-action: none;
     }
     .modal-content {
       background: var(--bg-card); padding: 30px; border-radius: 16px; text-align: center;
       max-width: 360px; width: 100%; border: 1px solid var(--border);
+      touch-action: manipulation;
     }
     .modal-btns { display: flex; gap: 15px; margin-top: 25px; }
-    .btn-modal { flex: 1; padding: 18px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .btn-modal { flex: 1; padding: 18px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; touch-action: manipulation; }
+    .btn-modal:active { transform: scale(0.95); }
     .btn-kgt { background: var(--accent-orange); color: white; }
     .btn-std { background: var(--accent-blue); color: #05040a; }
+
+    /* Стили для мобильного предупреждения */
+    .reload-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 71, 87, 0.95);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      z-index: 200;
+      box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4);
+      text-align: center;
+      max-width: 90%;
+      animation: slideUp 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .reload-toast .btn-toast-confirm {
+      background: white;
+      color: #ff4757;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 10px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .reload-toast .btn-toast-confirm:active { transform: scale(0.95); }
+    @keyframes slideUp {
+      from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* Убираем стандартные жесты обновления на мобильных */
+    body {
+      overscroll-behavior: none;
+    }
+    .container {
+      overscroll-behavior: contain;
+    }
   </style>
 </head>
 <body>
@@ -126,21 +199,154 @@
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec"; 
+  const API_URL = "ВАШ_URL_ИЗ_GOOGLE_APPS_SCRIPT"; 
 
   let currentOrderRow = null;
   let isExitingWork = false;
+  let isLocked = false;
+  let toastElement = null;
+
+  // ===== ЗАЩИТА НА МОБИЛЬНЫХ УСТРОЙСТВАХ =====
 
   window.onload = function() {
     loadNextOrder();
+    
+    // 1. Защита от обновления свайпом вниз (pull-to-refresh)
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.closest('.container') && e.touches.length === 1) {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const touchY = e.touches[0].clientY;
+        
+        // Если палец в верхней части экрана и тянет вниз
+        if (touchY < 100 && scrollTop === 0) {
+          e.preventDefault();
+          if (currentOrderRow) {
+            showMobileReloadWarning();
+          }
+        }
+      }
+    }, { passive: false });
+
+    // 2. Блокировка жеста "потянуть для обновления" через CSS
+    document.body.style.overscrollBehavior = 'none';
+    document.querySelector('.container').style.overscrollBehavior = 'contain';
+
+    // 3. Защита от обновления через системное меню (Chrome, Safari)
+    // На iOS: предотвращаем обновление через "pull-to-refresh"
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // 4. Блокировка двойного тапа для зума
+    document.addEventListener('dblclick', function(e) {
+      if (e.target.closest('.container')) {
+        e.preventDefault();
+      }
+    });
+
+    // 5. Защита от обновления через клавиатуру (для планшетов с клавиатурой)
+    document.addEventListener('keydown', preventRefresh);
+    
+    // 6. Защита от обновления через контекстное меню (правая кнопка)
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.closest('.container')) {
+        e.preventDefault();
+        if (currentOrderRow) {
+          showMobileReloadWarning();
+        }
+      }
+    });
+
+    // 7. Защита от случайного закрытия вкладки
+    window.addEventListener('beforeunload', function (e) {
+      if (currentOrderRow) {
+        e.preventDefault();
+        e.returnValue = 'У вас есть активное задание! Вы уверены, что хотите покинуть страницу?';
+        return e.returnValue;
+      }
+    });
+
+    // 8. Отключаем жесты навигации назад/вперёд
+    window.addEventListener('popstate', function(e) {
+      if (currentOrderRow) {
+        e.preventDefault();
+        showMobileReloadWarning();
+        history.pushState(null, '', window.location.href);
+      }
+    });
+    history.pushState(null, '', window.location.href);
   };
 
-  window.addEventListener('beforeunload', function (e) {
-    if (currentOrderRow) {
-      e.preventDefault();
-      e.returnValue = 'У вас есть активное задание!';
+  // Показ мобильного предупреждения
+  function showMobileReloadWarning() {
+    if (toastElement) return;
+    
+    toastElement = document.createElement('div');
+    toastElement.className = 'reload-toast';
+    toastElement.innerHTML = `
+      ⚠️ У вас есть активное задание (квадрат ${document.getElementById('current-square').textContent})<br>
+      Обновление приведёт к потере данных!
+      <br><br>
+      <button class="btn-toast-confirm" onclick="confirmReload()">Обновить страницу</button>
+      <button class="btn-toast-confirm" style="background:transparent;color:white;border:1px solid white;margin-left:10px;" onclick="closeToast()">Отмена</button>
+    `;
+    document.body.appendChild(toastElement);
+    
+    setTimeout(() => {
+      toastElement.style.opacity = '0';
+      toastElement.style.transition = 'opacity 0.3s';
+      setTimeout(() => {
+        if (toastElement) {
+          toastElement.remove();
+          toastElement = null;
+        }
+      }, 300);
+    }, 15000);
+  }
+
+  function closeToast() {
+    if (toastElement) {
+      toastElement.remove();
+      toastElement = null;
     }
-  });
+  }
+
+  function confirmReload() {
+    closeToast();
+    window.location.reload();
+  }
+
+  // Стандартная защита от F5 и Ctrl+R
+  function preventRefresh(e) {
+    if (e.key === 'F5' || 
+        (e.ctrlKey && e.key === 'r') || 
+        (e.metaKey && e.key === 'r') ||
+        (e.ctrlKey && e.shiftKey && e.key === 'r') ||
+        (e.metaKey && e.shiftKey && e.key === 'r')) {
+      e.preventDefault();
+      if (currentOrderRow) {
+        showMobileReloadWarning();
+      } else {
+        window.location.reload();
+      }
+      return false;
+    }
+  }
+
+  // Блокировка кнопки обновления
+  function setLocked(state) {
+    isLocked = state;
+    const refreshBtn = document.getElementById('btnRefresh');
+    if (state) {
+      refreshBtn.classList.add('loading');
+      refreshBtn.disabled = true;
+    } else {
+      refreshBtn.classList.remove('loading');
+      refreshBtn.disabled = false;
+    }
+  }
+
+  // ===== ОСНОВНАЯ ЛОГИКА =====
 
   function jsonp(url, callbackName, successCallback) {
     const uniqueCallback = callbackName + '_' + Math.round(Math.random() * 1000000);
@@ -156,22 +362,21 @@
   }
 
   function loadNextOrder() {
+    if (isLocked) return;
     if (document.getElementById('finished-box').style.display === 'block') return;
 
     const refreshBtn = document.getElementById('btnRefresh');
     const squareDiv = document.getElementById('current-square');
     const badgeSpan = document.getElementById('current-badge');
     
-    refreshBtn.classList.add('loading');
-    refreshBtn.disabled = true;
+    setLocked(true);
 
     var sendRow = currentOrderRow ? currentOrderRow : "";
     if (squareDiv.innerText !== '...') squareDiv.innerText = '...';
     if (badgeSpan.innerText !== '...') badgeSpan.innerText = '...';
 
     jsonp(`${API_URL}?action=getOldest&currentFormRow=${sendRow}`, 'cb_oldest', function(response) {
-      refreshBtn.classList.remove('loading');
-      refreshBtn.disabled = false;
+      setLocked(false);
 
       if(response.success && response.data) {
         currentOrderRow = response.data.row;

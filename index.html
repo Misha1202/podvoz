@@ -26,6 +26,7 @@
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
+      overscroll-behavior: none;
     }
     .container {
       width: 100%; max-width: 460px;
@@ -33,6 +34,7 @@
       border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 1px 1px var(--border);
       box-sizing: border-box; position: relative;
       touch-action: manipulation;
+      overscroll-behavior: contain;
     }
     .header-area {
       display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
@@ -46,48 +48,37 @@
     }
     .btn-refresh:hover { border-color: var(--primary); background: #1c1536; }
     .btn-refresh:active { transform: scale(0.95); }
+    .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-refresh svg { width: 16px; height: 16px; fill: currentColor; transition: transform 0.4s ease; }
     .btn-refresh.loading svg { animation: spin 0.8s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .square-display {
-      font-size: 80px;
-      font-weight: 900;
-      text-align: center;
-      margin-top: 30px;
-      margin-bottom: 5px;
-      color: #ffffff;
-      text-shadow:
-        0 0 10px rgba(138, 43, 226, 0.8),
-        0 0 20px rgba(138, 43, 226, 0.5),
-        0 0 40px rgba(138, 43, 226, 0.3),
-        0 0 80px rgba(138, 43, 226, 0.2);
+      font-size: 80px; font-weight: 900; text-align: center;
+      margin-top: 30px; margin-bottom: 5px; color: #ffffff;
+      text-shadow: 0 0 10px rgba(138, 43, 226, 0.8), 0 0 20px rgba(138, 43, 226, 0.5),
+                   0 0 40px rgba(138, 43, 226, 0.3), 0 0 80px rgba(138, 43, 226, 0.2);
       letter-spacing: 2px;
       background: linear-gradient(135deg, #c084fc, #a855f7, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
     }
     .badge-display {
       text-align: center; font-size: 18px; color: var(--text-muted); margin-bottom: 35px; font-weight: 500;
     }
     .badge-display span { color: var(--accent-blue); font-weight: 700; }
-    .actions-block {
-      display: flex; flex-direction: column; gap: 12px;
-    }
+    .actions-block { display: flex; flex-direction: column; gap: 12px; }
     .btn-done {
       width: 100%; padding: 18px; background: var(--primary); color: var(--text-main);
       border: none; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: 700;
-      transition: background 0.2s;
-      touch-action: manipulation;
+      transition: background 0.2s; touch-action: manipulation;
     }
     .btn-done:hover { background: var(--primary-hover); }
     .btn-done:active { transform: scale(0.98); }
+    .btn-done:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-exit {
       width: 100%; padding: 14px; background: transparent; color: var(--accent-red);
       border: 1px solid var(--border); border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: 600;
-      transition: all 0.2s;
-      touch-action: manipulation;
+      transition: all 0.2s; touch-action: manipulation;
     }
     .btn-exit:hover { background: rgba(255, 71, 87, 0.1); border-color: var(--accent-red); }
     .btn-exit:active { transform: scale(0.98); }
@@ -105,86 +96,107 @@
     .modal-btns { display: flex; gap: 15px; margin-top: 25px; }
     .btn-modal { flex: 1; padding: 18px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; touch-action: manipulation; }
     .btn-modal:active { transform: scale(0.95); }
+    .btn-modal:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-kgt { background: var(--accent-orange); color: white; }
     .btn-std { background: var(--accent-blue); color: #05040a; }
 
+    /* Экран входа */
+    .login-box { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+    .login-box label { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+    .login-box input {
+      width: 100%; padding: 16px; font-size: 18px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-main); color: var(--text-main);
+      box-sizing: border-box; outline: none; transition: border-color 0.2s;
+      -webkit-user-select: text; user-select: text;
+    }
+    .login-box input:focus { border-color: var(--primary); }
+    .login-error { color: var(--accent-red); font-size: 14px; min-height: 18px; text-align: center; }
+    .login-hint { color: var(--text-muted); font-size: 13px; text-align: center; margin-top: 5px; }
+
+    /* Индикатор сотрудника */
+    .employee-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .employee-bar b { color: var(--accent-blue); }
+    .employee-bar button {
+      background: transparent; border: none; color: var(--accent-red);
+      font-size: 12px; cursor: pointer; font-weight: 600; padding: 4px 8px;
+      touch-action: manipulation;
+    }
+
     /* Стили для мобильного предупреждения */
     .reload-toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 71, 87, 0.95);
-      color: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      z-index: 200;
-      box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4);
-      text-align: center;
-      max-width: 90%;
-      animation: slideUp 0.3s ease;
-      backdrop-filter: blur(10px);
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(255, 71, 87, 0.95); color: white; padding: 16px 24px;
+      border-radius: 12px; font-size: 16px; font-weight: 600; z-index: 200;
+      box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4); text-align: center; max-width: 90%;
+      animation: slideUp 0.3s ease; backdrop-filter: blur(10px);
     }
     .reload-toast .btn-toast-confirm {
-      background: white;
-      color: #ff4757;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      margin-top: 10px;
-      cursor: pointer;
-      touch-action: manipulation;
+      background: white; color: #ff4757; border: none; padding: 8px 20px;
+      border-radius: 8px; font-weight: 700; font-size: 14px; margin-top: 10px;
+      cursor: pointer; touch-action: manipulation;
     }
     .reload-toast .btn-toast-confirm:active { transform: scale(0.95); }
     @keyframes slideUp {
       from { transform: translateX(-50%) translateY(100px); opacity: 0; }
       to { transform: translateX(-50%) translateY(0); opacity: 1; }
     }
-
-    /* Убираем стандартные жесты обновления на мобильных */
-    body {
-      overscroll-behavior: none;
-    }
-    .container {
-      overscroll-behavior: contain;
-    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header-area">
-    <h2 id="screen-title">Текущее задание</h2>
-    <button class="btn-refresh" id="btnRefresh" onclick="loadNextOrder()">
-      <svg viewBox="0 0 24 24">
-        <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-      </svg>
-      Обновить
-    </button>
-  </div>
-
-  <div id="order-box">
-    <div class="square-display" id="current-square">...</div>
-    <div class="badge-display">Бейдж заказа: <span id="current-badge">...</span></div>
-    
-    <div class="actions-block">
-      <button class="btn-done" onclick="showModal()">Готово</button>
-      <button class="btn-exit" id="btnExit" onclick="handleWorkExit()">Завершить работу</button>
+  <!-- Экран входа -->
+  <div id="login-screen">
+    <h2 style="text-align:center; margin-bottom: 25px;">Вход в смену</h2>
+    <div class="login-box">
+      <label for="employeeIdInput">ID сотрудника подвоза</label>
+      <input id="employeeIdInput" type="text" inputmode="numeric" autocomplete="off"
+             placeholder="Введите ваш ID" maxlength="20">
+      <div class="login-error" id="loginError"></div>
+      <button class="btn-done" id="btnLogin" onclick="handleLogin()">Войти</button>
+      <div class="login-hint">ID нужен для привязки выполненных заказов</div>
     </div>
   </div>
 
-  <div id="empty-box" class="no-orders" style="display:none;">
-    ✨ Все задания выполнены!
-    <button class="btn-exit" style="margin-top:25px;" onclick="setWorkFinishedMode()">Завершить работу</button>
-  </div>
+  <!-- Основной экран -->
+  <div id="main-screen" style="display:none;">
+    <div class="employee-bar">
+      <div>Сотрудник: <b id="employeeIdLabel">—</b></div>
+      <button onclick="handleLogout()">Сменить</button>
+    </div>
 
-  <div id="finished-box" class="no-orders" style="display:none;">
-    🛑 Работа успешно завершена.<br>Смена закрыта.
-    <button class="btn-done" style="margin-top:25px; font-size:15px; padding:12px;" onclick="restartWork()">Начать работу заново</button>
+    <div class="header-area">
+      <h2 id="screen-title">Текущее задание</h2>
+      <button class="btn-refresh" id="btnRefresh" onclick="loadNextOrder()">
+        <svg viewBox="0 0 24 24">
+          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+        Обновить
+      </button>
+    </div>
+
+    <div id="order-box">
+      <div class="square-display" id="current-square">...</div>
+      <div class="badge-display">Бейдж заказа: <span id="current-badge">...</span></div>
+
+      <div class="actions-block">
+        <button class="btn-done" id="btnDone" onclick="showModal()">Готово</button>
+        <button class="btn-exit" id="btnExit" onclick="handleWorkExit()">Завершить работу</button>
+      </div>
+    </div>
+
+    <div id="empty-box" class="no-orders" style="display:none;">
+      ✨ Все задания выполнены!
+      <button class="btn-exit" style="margin-top:25px;" onclick="setWorkFinishedMode()">Завершить работу</button>
+    </div>
+
+    <div id="finished-box" class="no-orders" style="display:none;">
+      🛑 Работа успешно завершена.<br>Смена закрыта.
+      <button class="btn-done" style="margin-top:25px; font-size:15px; padding:12px;" onclick="restartWork()">Начать работу заново</button>
+    </div>
   </div>
 </div>
 
@@ -192,81 +204,77 @@
   <div class="modal-content">
     <h3>Выберите тип груза</h3>
     <div class="modal-btns">
-      <button class="btn-modal btn-kgt" onclick="selectType('КГТ')">КГТ</button>
-      <button class="btn-modal btn-std" onclick="selectType('Стандарт')">Стандарт</button>
+      <button class="btn-modal btn-kgt" id="btnTypeKGT" onclick="selectType('КГТ')">КГТ</button>
+      <button class="btn-modal btn-std" id="btnTypeSTD" onclick="selectType('Стандарт')">Стандарт</button>
     </div>
   </div>
 </div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec"; 
+  const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec";
+  const LS_KEY = "podvoz_employee_id";
 
   let currentOrderRow = null;
+  let employeeId = null;
   let isExitingWork = false;
   let isLocked = false;
+  let isSubmitting = false;
   let toastElement = null;
+  let activeJsonp = null;
 
   // ===== ЗАЩИТА НА МОБИЛЬНЫХ УСТРОЙСТВАХ =====
 
   window.onload = function() {
-    loadNextOrder();
-    
+    // Пытаемся восстановить ID
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      employeeId = saved;
+      enterMainScreen();
+    } else {
+      document.getElementById('login-screen').style.display = 'block';
+      document.getElementById('main-screen').style.display = 'none';
+      setTimeout(() => document.getElementById('employeeIdInput').focus(), 100);
+    }
+
     // 1. Защита от обновления свайпом вниз (pull-to-refresh)
     document.addEventListener('touchmove', function(e) {
       if (e.target.closest('.container') && e.touches.length === 1) {
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         const touchY = e.touches[0].clientY;
-        
-        // Если палец в верхней части экрана и тянет вниз
         if (touchY < 100 && scrollTop === 0) {
           e.preventDefault();
-          if (currentOrderRow) {
-            showMobileReloadWarning();
-          }
+          if (currentOrderRow) showMobileReloadWarning();
         }
       }
     }, { passive: false });
 
-    // 2. Блокировка жеста "потянуть для обновления" через CSS
     document.body.style.overscrollBehavior = 'none';
-    document.querySelector('.container').style.overscrollBehavior = 'contain';
+    const c = document.querySelector('.container');
+    if (c) c.style.overscrollBehavior = 'contain';
 
-    // 3. Защита от обновления через системное меню (Chrome, Safari)
-    // На iOS: предотвращаем обновление через "pull-to-refresh"
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
-    // 4. Блокировка двойного тапа для зума
     document.addEventListener('dblclick', function(e) {
-      if (e.target.closest('.container')) {
-        e.preventDefault();
-      }
+      if (e.target.closest('.container')) e.preventDefault();
     });
 
-    // 5. Защита от обновления через клавиатуру (для планшетов с клавиатурой)
     document.addEventListener('keydown', preventRefresh);
-    
-    // 6. Защита от обновления через контекстное меню (правая кнопка)
+
     document.addEventListener('contextmenu', function(e) {
       if (e.target.closest('.container')) {
         e.preventDefault();
-        if (currentOrderRow) {
-          showMobileReloadWarning();
-        }
+        if (currentOrderRow) showMobileReloadWarning();
       }
     });
 
-    // 7. Защита от случайного закрытия вкладки
     window.addEventListener('beforeunload', function (e) {
-      if (currentOrderRow) {
+      if (currentOrderRow && !isSubmitting) {
         e.preventDefault();
         e.returnValue = 'У вас есть активное задание! Вы уверены, что хотите покинуть страницу?';
         return e.returnValue;
       }
     });
 
-    // 8. Отключаем жесты навигации назад/вперёд
     window.addEventListener('popstate', function(e) {
       if (currentOrderRow) {
         e.preventDefault();
@@ -277,108 +285,189 @@
     history.pushState(null, '', window.location.href);
   };
 
-  // Показ мобильного предупреждения
+  // ===== ВХОД / ВЫХОД =====
+
+  function handleLogin() {
+    const input = document.getElementById('employeeIdInput');
+    const err = document.getElementById('loginError');
+    const val = (input.value || '').trim();
+
+    if (!val) {
+      err.textContent = 'Введите ID сотрудника';
+      return;
+    }
+    if (!/^[A-Za-z0-9_\-]+$/.test(val)) {
+      err.textContent = 'ID может содержать только буквы, цифры, _ и -';
+      return;
+    }
+    if (val.length > 20) {
+      err.textContent = 'ID слишком длинный';
+      return;
+    }
+
+    err.textContent = '';
+    employeeId = val;
+    localStorage.setItem(LS_KEY, employeeId);
+    enterMainScreen();
+  }
+
+  function enterMainScreen() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    document.getElementById('employeeIdLabel').textContent = employeeId;
+
+    // Сбрасываем состояние
+    currentOrderRow = null;
+    isExitingWork = false;
+    isSubmitting = false;
+    document.getElementById('finished-box').style.display = 'none';
+    document.getElementById('empty-box').style.display = 'none';
+    document.getElementById('order-box').style.display = 'block';
+    document.getElementById('btnRefresh').style.display = 'flex';
+    document.getElementById('screen-title').style.display = 'block';
+    document.getElementById('current-square').innerText = '...';
+    document.getElementById('current-badge').innerText = '...';
+
+    loadNextOrder();
+  }
+
+  function handleLogout() {
+    if (currentOrderRow && !confirm('У вас есть активное задание. Выйти из смены?')) return;
+    localStorage.removeItem(LS_KEY);
+    employeeId = null;
+    currentOrderRow = null;
+    document.getElementById('main-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+    document.getElementById('employeeIdInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    setTimeout(() => document.getElementById('employeeIdInput').focus(), 100);
+  }
+
+  // ===== ПРЕДУПРЕЖДЕНИЕ ОБ ОБНОВЛЕНИИ =====
+
   function showMobileReloadWarning() {
     if (toastElement) return;
-    
     toastElement = document.createElement('div');
     toastElement.className = 'reload-toast';
+    const sq = document.getElementById('current-square').textContent;
     toastElement.innerHTML = `
-      ⚠️ У вас есть активное задание (квадрат ${document.getElementById('current-square').textContent})<br>
+      ⚠️ У вас есть активное задание (квадрат ${sq})<br>
       Обновление приведёт к потере данных!
       <br><br>
       <button class="btn-toast-confirm" onclick="confirmReload()">Обновить страницу</button>
       <button class="btn-toast-confirm" style="background:transparent;color:white;border:1px solid white;margin-left:10px;" onclick="closeToast()">Отмена</button>
     `;
     document.body.appendChild(toastElement);
-    
     setTimeout(() => {
+      if (!toastElement) return;
       toastElement.style.opacity = '0';
       toastElement.style.transition = 'opacity 0.3s';
-      setTimeout(() => {
-        if (toastElement) {
-          toastElement.remove();
-          toastElement = null;
-        }
-      }, 300);
+      setTimeout(() => { if (toastElement) { toastElement.remove(); toastElement = null; } }, 300);
     }, 15000);
   }
 
   function closeToast() {
-    if (toastElement) {
-      toastElement.remove();
-      toastElement = null;
-    }
+    if (toastElement) { toastElement.remove(); toastElement = null; }
   }
 
   function confirmReload() {
     closeToast();
+    isSubmitting = true; // чтобы beforeunload не мешал
     window.location.reload();
   }
 
-  // Стандартная защита от F5 и Ctrl+R
   function preventRefresh(e) {
-    if (e.key === 'F5' || 
-        (e.ctrlKey && e.key === 'r') || 
+    if (e.key === 'F5' ||
+        (e.ctrlKey && e.key === 'r') ||
         (e.metaKey && e.key === 'r') ||
         (e.ctrlKey && e.shiftKey && e.key === 'r') ||
         (e.metaKey && e.shiftKey && e.key === 'r')) {
       e.preventDefault();
-      if (currentOrderRow) {
-        showMobileReloadWarning();
-      } else {
-        window.location.reload();
-      }
+      if (currentOrderRow) showMobileReloadWarning();
+      else window.location.reload();
       return false;
     }
   }
 
-  // Блокировка кнопки обновления
+  // ===== БЛОКИРОВКА UI =====
+
   function setLocked(state) {
     isLocked = state;
     const refreshBtn = document.getElementById('btnRefresh');
+    const btnDone = document.getElementById('btnDone');
+    if (!refreshBtn) return;
     if (state) {
       refreshBtn.classList.add('loading');
       refreshBtn.disabled = true;
+      if (btnDone) btnDone.disabled = true;
     } else {
       refreshBtn.classList.remove('loading');
       refreshBtn.disabled = false;
+      if (btnDone) btnDone.disabled = false;
     }
   }
 
-  // ===== ОСНОВНАЯ ЛОГИКА =====
+  // ===== JSONP С ТАЙМАУТОМ =====
 
-  function jsonp(url, callbackName, successCallback) {
+  function jsonp(url, callbackName, successCallback, timeoutMs) {
+    timeoutMs = timeoutMs || 15000;
     const uniqueCallback = callbackName + '_' + Math.round(Math.random() * 1000000);
-    window[uniqueCallback] = function(data) {
-      successCallback(data);
-      document.getElementById(uniqueCallback).remove();
-      delete window[uniqueCallback];
-    };
     let script = document.createElement('script');
+    let finished = false;
+
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      const el = document.getElementById(uniqueCallback);
+      if (el) el.remove();
+      try { delete window[uniqueCallback]; } catch(e) {}
+      if (activeJsonp && activeJsonp.id === uniqueCallback) activeJsonp = null;
+    };
+
+    const timer = setTimeout(() => {
+      cleanup();
+      successCallback({ success: false, error: 'timeout' });
+    }, timeoutMs);
+
+    window[uniqueCallback] = function(data) {
+      clearTimeout(timer);
+      cleanup();
+      successCallback(data || { success: false });
+    };
+
     script.id = uniqueCallback;
     script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + uniqueCallback;
+    script.onerror = function() {
+      clearTimeout(timer);
+      cleanup();
+      successCallback({ success: false, error: 'network' });
+    };
+    activeJsonp = { id: uniqueCallback };
     document.body.appendChild(script);
   }
 
+  // ===== ЗАГРУЗКА ЗАКАЗА =====
+
   function loadNextOrder() {
+    if (!employeeId) return;
     if (isLocked) return;
     if (document.getElementById('finished-box').style.display === 'block') return;
 
-    const refreshBtn = document.getElementById('btnRefresh');
     const squareDiv = document.getElementById('current-square');
     const badgeSpan = document.getElementById('current-badge');
-    
+
     setLocked(true);
 
-    var sendRow = currentOrderRow ? currentOrderRow : "";
+    const sendRow = currentOrderRow ? currentOrderRow : "";
     if (squareDiv.innerText !== '...') squareDiv.innerText = '...';
     if (badgeSpan.innerText !== '...') badgeSpan.innerText = '...';
 
-    jsonp(`${API_URL}?action=getOldest&currentFormRow=${sendRow}`, 'cb_oldest', function(response) {
+    const url = `${API_URL}?action=getOldest&currentFormRow=${encodeURIComponent(sendRow)}&employeeId=${encodeURIComponent(employeeId)}`;
+
+    jsonp(url, 'cb_oldest', function(response) {
       setLocked(false);
 
-      if(response.success && response.data) {
+      if (response && response.success && response.data) {
         currentOrderRow = response.data.row;
         squareDiv.innerText = response.data.square;
         badgeSpan.innerText = response.data.badge || 'Не указан';
@@ -391,8 +480,10 @@
         document.getElementById('empty-box').style.display = 'block';
         document.getElementById('finished-box').style.display = 'none';
       }
-    });
+    }, 20000);
   }
+
+  // ===== ЗАВЕРШЕНИЕ РАБОТЫ =====
 
   function handleWorkExit() {
     if (currentOrderRow) {
@@ -403,30 +494,59 @@
     }
   }
 
-  function showModal() { 
-    if(currentOrderRow) document.getElementById('typeModal').style.display = 'flex'; 
+  function showModal() {
+    if (isLocked || isSubmitting) return;
+    if (currentOrderRow) document.getElementById('typeModal').style.display = 'flex';
   }
 
   document.getElementById('typeModal').addEventListener('click', function(e) {
-    if(e.target === this) {
+    if (e.target === this) {
       this.style.display = 'none';
       isExitingWork = false;
     }
   });
 
   function selectType(type) {
+    if (isSubmitting) return;
+    if (!currentOrderRow) return;
+
+    isSubmitting = true;
     document.getElementById('typeModal').style.display = 'none';
-    if(!currentOrderRow) return;
-    
-    document.getElementById('current-square').innerText = '...';
-    document.getElementById('current-badge').innerText = '...';
+    document.getElementById('btnTypeKGT').disabled = true;
+    document.getElementById('btnTypeSTD').disabled = true;
+
+    const squareDiv = document.getElementById('current-square');
+    const badgeSpan = document.getElementById('current-badge');
+    squareDiv.innerText = '...';
+    badgeSpan.innerText = '...';
+
+    const rowToSend = currentOrderRow;
+    currentOrderRow = null;
 
     let formBody = new URLSearchParams();
     formBody.append('action', 'completeOrder');
-    formBody.append('row', currentOrderRow);
+    formBody.append('row', rowToSend);
     formBody.append('type', type);
+    formBody.append('employeeId', employeeId || '');
 
-    currentOrderRow = null;
+    const finish = (ok) => {
+      isSubmitting = false;
+      document.getElementById('btnTypeKGT').disabled = false;
+      document.getElementById('btnTypeSTD').disabled = false;
+
+      if (!ok) {
+        // Возвращаем заказ, чтобы можно было повторить
+        currentOrderRow = rowToSend;
+        alert('Не удалось отправить. Попробуйте ещё раз.');
+        return;
+      }
+
+      if (isExitingWork) {
+        setWorkFinishedMode();
+      } else {
+        setTimeout(loadNextOrder, 400);
+      }
+    };
 
     fetch(API_URL, {
       method: 'POST',
@@ -434,19 +554,19 @@
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formBody
     }).then(() => {
-      if (isExitingWork) {
-        setWorkFinishedMode();
-      } else {
-        setTimeout(loadNextOrder, 400); 
-      }
-    }).catch(err => {
-      alert('Ошибка сети при обновлении статуса');
+      // no-cors не даёт ответа — считаем успехом, но с небольшой задержкой
+      finish(true);
+    }).catch(() => {
+      finish(false);
     });
   }
+
+  // ===== ФИНАЛЬНЫЕ ЭКРАНЫ =====
 
   function setWorkFinishedMode() {
     currentOrderRow = null;
     isExitingWork = false;
+    isSubmitting = false;
     document.getElementById('order-box').style.display = 'none';
     document.getElementById('empty-box').style.display = 'none';
     document.getElementById('btnRefresh').style.display = 'none';

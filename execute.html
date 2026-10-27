@@ -541,12 +541,8 @@
       if (response && response.success && response.data) {
         currentOrderRow = response.data.row;
         setSquare(response.data.square);
-        // Бейдж заказа: если сервер отдаёт badge — показываем его.
-        // Если нет — показываем ID сотрудника (кто везёт).
-        badgeSpan.innerText = response.data.badge
-                              || response.data.employeeId
-                              || employeeId
-                              || 'Не указан';
+        // Показываем бейдж заказчика, который передал сервер.
+        badgeSpan.innerText = response.data.badge || 'Не указан';
         showBox('order-box');
 
         // Проверка завершения: если сервер вернул только что отправленный

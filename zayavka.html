@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f0c1b">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+  <title>Заказ подвоза</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-main: #0f0c1b;
+      --bg-card: #18142c;
+      --primary: #8a2be2;
+      --accent-green: #00f5d4;
+      --text-main: #f3f0ff;
+      --text-muted: #a39fbc;
+      --border: #2e2754;
+      --border-soft: rgba(255,255,255,.07);
+      --accent-red: #ff4757;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: max(15px, env(safe-area-inset-top)) 15px max(15px, env(safe-area-inset-bottom));
+      background-color: var(--bg-main); color: var(--text-main);
+      background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(138,43,226,.18), transparent);
+      display: flex; justify-content: center; align-items: center; min-height: 95vh;
+      -webkit-user-select: none; user-select: none;
+    }
+    .container {
+      width: 100%; max-width: 460px;
+      background: linear-gradient(160deg, #1b1633 0%, #151126 55%, #120e22 100%);
+      padding: 30px; border-radius: 20px; box-sizing: border-box;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 20px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+    .logo {
+      width: 74px; height: 74px; margin: 0 auto 18px; border-radius: 22px;
+      background: linear-gradient(135deg, #00f5d4, #01bfa8);
+      display: flex; align-items: center; justify-content: center; font-size: 34px;
+      box-shadow: 0 10px 30px rgba(0,245,212,.25);
+    }
+    h2 { margin: 0 0 4px; text-align: center; font-size: 24px; font-weight: 800; }
+    .sub { margin: 0 0 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); font-weight: 600; }
+    input, select {
+      width: 100%; padding: 15px; background: var(--bg-main); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text-main); font-size: 17px; box-sizing: border-box;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+      font-variant-numeric: tabular-nums; -webkit-user-select: text; user-select: text;
+    }
+    select { -webkit-user-select: none; user-select: none; }
+    input:focus, select:focus { border-color: var(--accent-green); box-shadow: 0 0 0 4px rgba(0,245,212,.12); }
+    select:invalid { color: var(--text-muted); }
+    .btn {
+      width: 100%; padding: 17px; margin-top: 6px;
+      background: linear-gradient(135deg, #00f5d4, #01bfa8); color: #05040a;
+      border: none; border-radius: 14px; font-size: 17px; cursor: pointer; font-weight: 800;
+      box-shadow: 0 8px 24px rgba(0,245,212,.25), inset 0 1px 0 rgba(255,255,255,.25);
+      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+      touch-action: manipulation;
+    }
+    .btn:hover { filter: brightness(1.08); box-shadow: 0 10px 30px rgba(0,245,212,.35), inset 0 1px 0 rgba(255,255,255,.25); }
+    .btn:active { transform: translateY(1px) scale(.98); }
+    .btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; filter: none; box-shadow: none; }
+    .form-error { color: var(--accent-red); font-size: 14px; min-height: 18px; text-align: center; margin-top: 12px; font-weight: 600; }
+    .back-link { display: block; margin-top: 18px; text-align: center; color: var(--text-muted); font-size: 14px; text-decoration: none; font-weight: 600; }
+    .back-link:hover { color: var(--text-main); }
+    .success-box { text-align: center; padding: 34px 0; animation: fadeIn .3s ease; }
+    .success-box .state-icon { font-size: 52px; margin-bottom: 14px; }
+    .success-box b { font-size: 20px; display: block; margin-bottom: 8px; }
+    .success-box .state-sub { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 22px; }
+    .state-sub .sq { color: var(--accent-green); font-weight: 700; }
+    .btn-again { width: auto; padding: 13px 30px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="form-screen">
+    <div class="logo">📋</div>
+    <h2>Заказать подвоз</h2>
+    <p class="sub">Заявка уйдёт в таблицу подвоза</p>
+
+    <div class="form-group">
+      <label for="badge">Бейдж сотрудника</label>
+      <input
+        type="text"
+        id="badge"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        placeholder="Введите номер бейджа"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="square">Выгрузить в квадрат</label>
+      <select id="square" required>
+        <option value="">Загрузка списка...</option>
+      </select>
+    </div>
+
+    <button class="btn" id="btnSubmit" onclick="submitOrder()">Отправить заявку</button>
+    <div class="form-error" id="formError"></div>
+    <a class="back-link" href="index.html">← На главную</a>
+  </div>
+
+  <div id="success-screen" class="success-box" style="display:none;">
+    <div class="state-icon">✅</div>
+    <b>Заявка отправлена!</b>
+    <div class="state-sub">Подвоз в квадрат <span class="sq" id="sentSquare">—</span> добавлен в таблицу</div>
+    <button class="btn btn-again" onclick="showFormScreen()">Отправить ещё одну</button>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbwFHgSJUyeHczRzbCRzUeGKpd1s28zA8h1zFv28hDp7oEtVZkF_3Rs2LErPpO67fYj7-A/exec";
+  const SQUARES_JSON_URL = "squares.json";
+
+  window.onload = function() {
+    loadSquares();
+  };
+
+  function isOffline() { return navigator.onLine === false; }
+
+  function loadSquares() {
+    fetch(SQUARES_JSON_URL)
+      .then(res => {
+        if (!res.ok) throw new Error('Не удалось загрузить squares.json');
+        return res.json();
+      })
+      .then(squares => {
+        const select = document.getElementById('square');
+        select.innerHTML = '<option value="">Выберите квадрат</option>';
+        squares.forEach(sq => {
+          const opt = document.createElement('option');
+          opt.value = sq; opt.innerText = sq;
+          select.appendChild(opt);
+        });
+      })
+      .catch(() => {
+        document.getElementById('square').innerHTML = '<option value="">Ошибка загрузки — обновите страницу</option>';
+      });
+  }
+
+  function showFormScreen() {
+    document.getElementById('success-screen').style.display = 'none';
+    document.getElementById('form-screen').style.display = 'block';
+    document.getElementById('badge').value = '';
+    document.getElementById('square').value = '';
+    document.getElementById('formError').textContent = '';
+  }
+
+  function submitOrder() {
+    const badge = document.getElementById('badge').value.trim();
+    const square = document.getElementById('square').value;
+    const btn = document.getElementById('btnSubmit');
+    const err = document.getElementById('formError');
+
+    if (isOffline()) { err.textContent = 'Нет сети. Проверьте подключение.'; return; }
+    if (!badge || !square) {
+      err.textContent = 'Пожалуйста, заполните бейдж и выберите квадрат';
+      return;
+    }
+
+    err.textContent = '';
+    btn.disabled = true;
+    btn.innerText = 'Отправляю…';
+
+    const formBody = new URLSearchParams();
+    formBody.append('action', 'addOrder');
+    formBody.append('badge', badge);
+    formBody.append('square', square);
+
+    fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody
+    }).then(() => {
+      document.getElementById('sentSquare').innerText = square;
+      document.getElementById('form-screen').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+    }).catch(() => {
+      err.textContent = 'Ошибка сети. Проверьте подключение и попробуйте ещё раз.';
+    }).finally(() => {
+      btn.disabled = false;
+      btn.innerText = 'Отправить заявку';
+    });
+  }
+</script>
+</body>
+</html>

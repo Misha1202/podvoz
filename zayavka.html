@@ -198,8 +198,11 @@
         document.getElementById('form-screen').style.display = 'none';
         document.getElementById('success-screen').style.display = 'block';
       })
-      .catch(() => {
-        err.textContent = 'Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.';
+      .catch((e) => {
+        const generic = ['bad_response', 'server_error', 'Failed to fetch', 'NetworkError when attempting to fetch resource.', 'Load failed'];
+        err.textContent = (e && e.message && generic.indexOf(e.message) === -1)
+          ? e.message
+          : 'Не удалось отправить заявку. Проверьте данные и попробуйте ещё раз.';
       })
       .finally(() => {
         btn.disabled = false;
